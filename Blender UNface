@@ -1,0 +1,36 @@
+import bpy
+
+# Get the active object
+obj = bpy.context.active_object
+
+# Switch to Edit Mode
+bpy.ops.object.mode_set(mode='EDIT')
+
+# Ensure we're in face selection mode
+bpy.ops.mesh.select_mode(type='FACE')
+
+# Get selected faces and store their indices in an array
+selected_faces = [p.index for p in obj.data.polygons if p.select]
+
+# Deselect all faces
+bpy.ops.mesh.select_all(action='DESELECT')
+
+# Switch back to Object Mode
+bpy.ops.object.mode_set(mode='OBJECT')
+
+# Loop through each selected face and unwrap individually
+for face_index in selected_faces:
+    # Switch to Edit Mode
+    bpy.ops.object.mode_set(mode='EDIT')
+    
+    # Select the current face
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode='OBJECT')  # Switch to Object Mode temporarily
+    obj.data.polygons[face_index].select = True
+    bpy.ops.object.mode_set(mode='EDIT')  # Switch back to Edit Mode
+
+    # Unwrap the selected face
+    bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)  # Adjust method and margin as needed
+
+# Switch back to Object Mode
+bpy.ops.object.mode_set(mode='OBJECT')
